@@ -10,7 +10,16 @@ def cria_posicao(c, l):  # str x str -> posicao
     :param l: Linha, pode ser '1', '2' ou '3'
     :return: Posicao do tabuleiro.
     """
+    if c == 'a':
+        c = 1
+    elif c == 'b':
+        c = 2
+    elif c == 'c':
+        c = 3
+    else:
+        raise ValueError('cria posicao: argumentos invalidos')
 
+    l = int(l)
     p = [c, l]
     if not eh_posicao(p):
         raise ValueError('cria posicao: argumentos invalidos')
@@ -37,7 +46,14 @@ def obter_pos_c(p):  # posicao -> str
     :param p: posicao
     :return: coluna da posicao
     """
-    return p[0]
+    if p[0] == 1:
+        return '1'
+    elif p[0] == 2:
+        return '2'
+    elif p[0] == 3:
+        return '3'
+    else:
+        raise ValueError('obter_pos_c: argumento invalido')
 
 
 def obter_pos_l(p):  # posicao -> str
@@ -46,7 +62,7 @@ def obter_pos_l(p):  # posicao -> str
     :param p: posicao
     :return: linha da posicao
     """
-    return p[1]
+    return str(p[1])
 
 
 # Reconhecedores
@@ -59,9 +75,9 @@ def eh_posicao(p):  # universal -> booleano
     c = p[0]
     l = p[1]
 
-    if type(c) != str or type(l) != str:
+    if type(c) != int or type(l) != int:
         return False
-    if c != 'a' and c != 'b' and c != 'c':
+    if c != '1' and c != '2' and c != '3':
           return False
     if l != '1' and l != '2' and l != '3':
         return False
@@ -104,3 +120,88 @@ def obter_posicoes_adjacentes(p):  # posicao -> tuplo de posicoes
     """
 
     return 0
+
+
+# TAD peca
+
+# Construtor
+def cria_peca(s):  # str -> peca
+    """
+    Recebe uma cadeia de carateres correspondentea uma peca e devolve a peca
+    correspondente se o argumento for valido.
+    :param s: String da peca (pode ser 'X', 'O' ou ' ')
+    :return: peca
+    """
+    if s == 'X':
+        return 1
+    elif s == 'O':
+        return -1
+    elif s == ' ':
+        return 0
+    else:
+        raise ValueError('cria peca: argumento invalido')
+
+
+def cria_copia_peca(j):  # peca -> peca
+    """
+    Permite copiar uma peca.
+    :param j: peca
+    :return: valor da peca
+    """
+    if not eh_peca(j):
+        return ValueError
+    return j
+
+
+# Reconhecedor
+def eh_peca(arg):   # universal -> booleano
+    """
+    Indica se determinado argumento e uma peca
+    :param arg: valor da peca
+    :return: True se o argumento for uma peca, False caso contrario
+    """
+    if type(arg) != int:
+        return False
+    if arg != 1 and arg != -1 and arg != 0:
+        return False
+    return True
+
+
+# Teste
+def pecas_iguais(j1, j2):   # peca x peca -> booleano
+    """
+    Indica se duas pecas sao iguais
+    :param j1: peca 1
+    :param j2: peca 2
+    :return: True se forem iguais, False caso contrario
+    """
+    if j1 == j2:
+        return True
+    return False
+
+
+# Transformador
+def peca_para_str(j):  # peca -> str
+    """
+
+    :param j:
+    :return:
+    """
+    if j == 1:
+        return '[X]'
+    elif j == 1:
+        return '[0]'
+    elif j == 0:
+        return '[ ]'
+    else:
+        raise ValueError('peca_para_str: argumento invalido')
+
+
+# Funcoes de alto nivel
+def peca_para_inteiro(j):
+    """
+    Converte o valor de uma peca para inteiro
+    :param j: peca
+    :return: inteiro com o valor de 1, -1 ou 0 dependendo do valor da peca
+    """
+    return j
