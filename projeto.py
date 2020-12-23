@@ -15,14 +15,14 @@ def cria_posicao(c, l):  # str x str -> posicao
     if not eh_posicao(p):
         raise ValueError('cria posicao: argumentos invalidos')
 
-    return (c,l)
+    return c, l
 
 
-def cria_copia_posicao(p):
+def cria_copia_posicao(p):  # posicao -> posicao
     """
-
-    :param p:
-    :return:
+    Permite criar uma copia de uma posicao
+    :param p: posicao
+    :return: posicao
     """
     if not eh_posicao(p):
         raise ValueError('cria posicao: argumentos invalidos')
@@ -31,30 +31,30 @@ def cria_copia_posicao(p):
 
 
 # Seletores
-def obter_pos_c(p):
+def obter_pos_c(p):  # posicao -> str
     """
-
-    :param p:
-    :return:
+    Permite obter a coluna de uma posicao.
+    :param p: posicao
+    :return: coluna da posicao
     """
     return p[0]
 
 
-def obter_pos_l(p):
+def obter_pos_l(p):  # posicao -> str
     """
-
-    :param p:
-    :return:
+    Permite obter a linha de uma posicao.
+    :param p: posicao
+    :return: linha da posicao
     """
     return p[1]
 
 
 # Reconhecedores
-def eh_posicao(p):
+def eh_posicao(p):  # universal -> booleano
     """
-
-    :param p:
-    :return:
+    Indica se certo argumento e uma posicao ou nao
+    :param p: posicao
+    :return: True se o argumento for uma posicao, False caso contrario
     """
     c = p[0]
     l = p[1]
@@ -70,12 +70,12 @@ def eh_posicao(p):
 
 
 # Teste
-def posicoes_iguais(p1, p2):
+def posicoes_iguais(p1, p2):  # posicao x posicao -> booleano
     """
-
-    :param p1:
-    :param p2:
-    :return:
+    Indica se as posicoes inseridas sao iguais
+    :param p1: posicao
+    :param p2: posicao
+    :return: True se as posicoes forem iguais, False caso contrario
     """
     if not eh_posicao(p1) or not eh_posicao(p2):
         return False
@@ -85,15 +85,22 @@ def posicoes_iguais(p1, p2):
 
 
 # Transformador
-def posicao_para_str(p):
+def posicao_para_str(p):  # posicao -> str
     """
-
-    :param p:
-    :return:
+    Transforma a posicao numa string
+    :param p: posicao
+    :return: string com a posicao
     """
     return p[0]+p[1]
 
 
 # Funcoes de alto nivel
 
-def obter_posicoes_adjacentes():
+def obter_posicoes_adjacentes(p):  # posicao -> tuplo de posicoes
+    """
+    Indica as posicoes adjacentes a posicao introduzida
+    :param p: posicao
+    :return: tuplo com as posicoes adjacentes
+    """
+
+    return 0
