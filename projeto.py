@@ -11,17 +11,21 @@ def cria_posicao(c, l):  # str x str -> posicao
     :return: Posicao do tabuleiro.
     """
     if c == 'a':
-        c = 1
+        c = 0
     elif c == 'b':
-        c = 2
+        c = 1
     elif c == 'c':
-        c = 3
+        c = 2
     else:
         raise ValueError('cria posicao: argumentos invalidos')
 
-    l = int(l)
-    p = [c, l]
-    if not eh_posicao(p):
+    if l == '1':
+        l = 0
+    elif l == '2':
+        l = 1
+    elif l == '3':
+        l = 2
+    else:
         raise ValueError('cria posicao: argumentos invalidos')
 
     return c, l
@@ -189,7 +193,7 @@ def peca_para_str(j):  # peca -> str
     """
     if j == 1:
         return '[X]'
-    elif j == 1:
+    elif j == -1:
         return '[0]'
     elif j == 0:
         return '[ ]'
@@ -198,10 +202,166 @@ def peca_para_str(j):  # peca -> str
 
 
 # Funcoes de alto nivel
-def peca_para_inteiro(j):
+def peca_para_inteiro(j):   # peca -> N
     """
-    Converte o valor de uma peca para inteiro
+    Converte o valor de uma peca para o valor 1, -1 ou 0 dependendo da peca
     :param j: peca
     :return: inteiro com o valor de 1, -1 ou 0 dependendo do valor da peca
     """
     return j
+
+
+# TAD tabuleiro
+
+# Construtor
+def cria_tabuleiro():
+    """
+    Cria um tabuleiro vazio
+    :return: tabuleiro 3x3 vazio
+    """
+    return [0, 0, 0], [0, 0, 0], [0, 0, 0]
+
+
+def cria_copia_tabuleiro(t):  # tabuleiro -> tabuleiro
+    """
+
+    :param t:
+    :return:
+    """
+
+    copia = (t[0].copy(), t[1].copy(), t[2].copy())
+    return copia
+
+
+# Seletores
+def obter_peca(tab, p):  # tabuleiro x posicao -> peca
+    """
+
+    :param tab:
+    :param p:
+    :return:
+    """
+    peca = tab[p[0]][p[1]]
+    return peca_para_str(peca)
+
+
+def obter_vetor(tab, sel):  # tabuleiro x str -> tuplo de pecas
+    """
+
+    :param tab:
+    :param sel:
+    :return:
+    """
+    if sel == 'a':
+        sel = 0
+    elif sel == 'b':
+        sel = 1
+    elif sel == 'c':
+        sel = 2
+    elif sel == '1' or sel == '2' or sel == '3':
+        return tuple(tab[int(sel)-1].copy())
+    else:
+        raise ValueError('obter_vetor: valores invalidos')
+
+    tuplo = ()
+    for linha in tab:
+        tuplo = tuplo + (linha[sel], )
+    return tuplo
+
+
+# Modificadores
+def coloca_peca(tab, peca, pos):  # tabuleiro x peca x posicao -> tabuleiro
+    """
+
+    :param tab:
+    :param peca:
+    :param pos:
+    :return:
+    """
+    tab[pos[0]][pos[1]] = peca
+    return tab
+
+
+def remove_peca(tab, pos):  # tabuleiro x posicao -> tabuleiro
+    """
+
+    :param tab:
+    :param pos:
+    :return:
+    """
+    tab[pos[0]][pos[1]] = 0
+    return tab
+
+
+def move_peca(tab, pos1, pos2):  # tabuleiro x posicao x posicao -> tabuleiro
+    """
+
+    :param tab:
+    :param pos1:
+    :param pos2:
+    :return:
+    """
+    peca = tab[pos1[0]][pos1[1]]
+    tab = coloca_peca(tab, pos2, peca)
+    tab = remove_peca(tab, pos1)
+    return tab
+
+
+# Reconhecedor
+def eh_tabuleiro(arg):  # universal -> booleano
+    """
+
+    :param arg:
+    :return:
+    """
+    x_count = 0
+    o_count = 0
+    if type(arg) != tuple or len(arg) != 3:
+        return False
+    for elmts in arg:
+        if type(elmt) != list or len(elmt) != 3:
+            return False
+        for elmt in elmts:
+            if elmt == 1:
+                x_count += 1
+            if elmt == -1:
+                o_count += 1
+    if o_count != x_count or o_count > 3:
+        return False
+    return True
+
+
+def eh_posicao_livre(tab, pos):  # tabuleiro x posicao -> booleano
+    """
+
+    :param tab:
+    :param pos:
+    :return:
+    """
+    if tab[pos[0]][pos[1]] == 0:
+        return True
+    return False
+
+
+# Teste
+def tabuleiros_iguais(tab1, tab2):  # tabuleiro x tabuleiro -> booleano
+    """
+
+    :param tab1:
+    :param tab2:
+    :return:
+    """
+    if eh_tabuleiro(tab1) and eh_tabuleiro(tab2) and tab1 == tab2:
+        return True
+    return False
+
+
+# Transformadores
+def tabuleiro_para_str(tab):  # tabuleiro -> str
+    str(
+        posicao_para_str(tab[0][0])+'-'+posicao_para_str(tab[0][1])+'-'+
+        posicao_para_str(tab[0][2])
+        posicao_para_str(tab[1][0]) + '-' + posicao_para_str(tab[1][1]) + '-' +
+        posicao_para_str(tab[1][2])
+        posicao_para_str(tab[2][0]) + '-' + posicao_para_str(tab[2][1]) + '-' +
+        posicao_para_str(tab[2][2]))
