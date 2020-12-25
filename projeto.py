@@ -39,8 +39,8 @@ def cria_copia_posicao(p):  # posicao -> posicao
     """
     if not eh_posicao(p):
         raise ValueError('cria posicao: argumentos invalidos')
-
-    return p
+    pos = cria_posicao(p[0], p[1])
+    return pos
 
 
 # Seletores
@@ -50,12 +50,12 @@ def obter_pos_c(p):  # posicao -> str
     :param p: posicao
     :return: coluna da posicao
     """
-    if p[0] == 1:
-        return '1'
+    if p[0] == 0:
+        return 'a'
+    elif p[0] == 1:
+        return 'b'
     elif p[0] == 2:
-        return '2'
-    elif p[0] == 3:
-        return '3'
+        return 'c'
     else:
         raise ValueError('obter_pos_c: argumento invalido')
 
@@ -66,7 +66,14 @@ def obter_pos_l(p):  # posicao -> str
     :param p: posicao
     :return: linha da posicao
     """
-    return str(p[1])
+    if p[0] == 0:
+        return '1'
+    elif p[0] == 1:
+        return '2'
+    elif p[0] == 2:
+        return '3'
+    else:
+        raise ValueError('obter_pos_c: argumento invalido')
 
 
 # Reconhecedores
@@ -111,10 +118,10 @@ def posicao_para_str(p):  # posicao -> str
     :param p: posicao
     :return: string com a posicao
     """
-    return p[0]+p[1]
+    return obter_pos_c(p)+obter_pos_l(p)
 
 
-# Funcoes de alto nivel
+# Funcoes de alto nivel--------------------------------------------------------
 
 def obter_posicoes_adjacentes(p):  # posicao -> tuplo de posicoes
     """
@@ -126,6 +133,7 @@ def obter_posicoes_adjacentes(p):  # posicao -> tuplo de posicoes
     return 0
 
 
+# ------------------------------------------------------------------------------
 # TAD peca
 
 # Construtor
@@ -164,11 +172,10 @@ def eh_peca(arg):   # universal -> booleano
     :param arg: valor da peca
     :return: True se o argumento for uma peca, False caso contrario
     """
-    if type(arg) != int:
-        return False
-    if arg != 1 and arg != -1 and arg != 0:
-        return False
-    return True
+    if type(arg) == int:
+        if arg == 1 or arg == -1 or arg == 0:
+            return True
+    return False
 
 
 # Teste
@@ -319,7 +326,7 @@ def eh_tabuleiro(arg):  # universal -> booleano
     if type(arg) != tuple or len(arg) != 3:
         return False
     for elmts in arg:
-        if type(elmt) != list or len(elmt) != 3:
+        if type(elmts) != list or len(elmts) != 3:
             return False
         for elmt in elmts:
             if elmt == 1:
@@ -358,10 +365,38 @@ def tabuleiros_iguais(tab1, tab2):  # tabuleiro x tabuleiro -> booleano
 
 # Transformadores
 def tabuleiro_para_str(tab):  # tabuleiro -> str
-    str(
-        posicao_para_str(tab[0][0])+'-'+posicao_para_str(tab[0][1])+'-'+
-        posicao_para_str(tab[0][2])
-        posicao_para_str(tab[1][0]) + '-' + posicao_para_str(tab[1][1]) + '-' +
-        posicao_para_str(tab[1][2])
-        posicao_para_str(tab[2][0]) + '-' + posicao_para_str(tab[2][1]) + '-' +
-        posicao_para_str(tab[2][2]))
+    """
+
+    :param tab:
+    :return:
+    """
+    tabstr = ''
+    for linha in range(3):
+        for coluna in range(3):
+            tabstr += peca_para_str(tab[coluna][linha])
+            if coluna < 2:
+                tabstr += '-'
+            else:
+                tabstr += '\n'
+        if linha == 0:
+            tabstr += ' | \ | / | ' + '\n'
+        if linha == 1:
+            tabstr += ' | / | \ | ' + '\n'
+    return tabstr
+
+
+def tuplo_para_tabuleiro(tab):  # tuplo -> tabuleiro
+    """
+
+    :return:
+    """
+    tabtuplo = ()
+    for elmts in tab:
+        tabtuplo += (tuple(elmts),)
+    return tabtuplo
+
+
+
+
+tab = ([0,1,0],[1,0,0],[0,0,1])
+print(tuplo_para_tabuleiro(tab))
