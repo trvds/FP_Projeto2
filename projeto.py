@@ -1,13 +1,13 @@
-# TAD posicao
+# TAD posicao-------------------------------------------------------------------
 
 # Construtores
-def cria_posicao(c, l):  # str x str -> posicao
+def cria_posicao(c, ln):  # str x str -> posicao
     """
     Recebe duas cadeias de carateres correspondentes a coluna c
     e a linha l de uma posicao e devolve a posicao correspondente, se ambos os
     argumentos forem validos.
     :param c: Coluna, pode ser 'a', 'b' ou 'c'
-    :param l: Linha, pode ser '1', '2' ou '3'
+    :param ln: Linha, pode ser '1', '2' ou '3'
     :return: Posicao do tabuleiro.
     """
     if c == 'a':
@@ -19,16 +19,16 @@ def cria_posicao(c, l):  # str x str -> posicao
     else:
         raise ValueError('cria posicao: argumentos invalidos')
 
-    if l == '1':
-        l = 0
-    elif l == '2':
-        l = 1
-    elif l == '3':
-        l = 2
+    if ln == '1':
+        ln = 0
+    elif ln == '2':
+        ln = 1
+    elif ln == '3':
+        ln = 2
     else:
         raise ValueError('cria posicao: argumentos invalidos')
 
-    return c, l
+    return c, ln
 
 
 def cria_copia_posicao(p):  # posicao -> posicao
@@ -66,11 +66,11 @@ def obter_pos_l(p):  # posicao -> str
     :param p: posicao
     :return: linha da posicao
     """
-    if p[0] == 0:
+    if p[1] == 0:
         return '1'
-    elif p[0] == 1:
+    elif p[1] == 1:
         return '2'
-    elif p[0] == 2:
+    elif p[1] == 2:
         return '3'
     else:
         raise ValueError('obter_pos_c: argumento invalido')
@@ -84,15 +84,13 @@ def eh_posicao(p):  # universal -> booleano
     :return: True se o argumento for uma posicao, False caso contrario
     """
     c = p[0]
-    l = p[1]
-
-    if type(c) != int or type(l) != int:
+    ln = p[1]
+    if type(c) != int or type(ln) != int:
         return False
-    if c != '1' and c != '2' and c != '3':
+    if c != 0 and c != 1 and c != 2:
         return False
-    if l != '1' and l != '2' and l != '3':
+    if ln != 0 and ln != 1 and ln != 2:
         return False
-
     return True
 
 
@@ -112,29 +110,65 @@ def posicoes_iguais(p1, p2):  # posicao x posicao -> booleano
 
 
 # Transformador
-def posicao_para_str(p):  # posicao -> str
+def posicao_para_str(pos):  # posicao -> str
     """
     Transforma a posicao numa string
-    :param p: posicao
+    :param pos: posicao
     :return: string com a posicao
     """
-    return obter_pos_c(p) + obter_pos_l(p)
+    return obter_pos_c(pos) + obter_pos_l(pos)
 
 
-# Funcoes de alto nivel--------------------------------------------------------
+def cl_adjacente(cl, fn):
+    """
 
-def obter_posicoes_adjacentes(p):  # posicao -> tuplo de posicoes
+    :param cl:
+    :param fn:
+    :return:
+    """
+    if cl == 'a':
+        cl = 0
+    elif cl == 'b':
+        cl = 1
+    elif cl == 'c':
+        cl = 2
+    if cl == '1':
+        cl = 0
+    elif cl == '2':
+        cl = 1
+    elif cl == '3':
+        cl = 2
+    if 0 <= fn(cl) <= 2:
+        return fn(cl)
+    return False
+
+
+# Funcoes de alto nivel---------------------------------------------------------
+def obter_posicoes_adjacentes(pos):  # posicao -> tuplo de posicoes
     """
     Indica as posicoes adjacentes a posicao introduzida
-    :param p: posicao
+    :param pos: posicao
     :return: tuplo com as posicoes adjacentes
     """
+    posicoes = ()
+    col = obter_pos_c(pos)
+    ln = obter_pos_l(pos)
+    if type(cl_adjacente(ln, lambda x: x-1)) == int:
+        posicoes += (cl_adjacente(col, lambda x: x)
+                     , cl_adjacente(ln, lambda x: x-1)),
+    if type(cl_adjacente(col, lambda x: x-1)) == int:
+        posicoes += (cl_adjacente(col, lambda x: x-1),
+                     cl_adjacente(ln, lambda x: x)),
+    if type(cl_adjacente(col, lambda x: x+1)) == int:
+        posicoes += (cl_adjacente(col, lambda x: x+1),
+                     cl_adjacente(ln, lambda x: x)),
+    if type(cl_adjacente(ln, lambda x: x+1)) == int:
+        posicoes += (cl_adjacente(col, lambda x: x),
+                     cl_adjacente(ln, lambda x: x+1)),
+    return posicoes
 
-    return 0
 
-
-# ------------------------------------------------------------------------------
-# TAD peca
+# TAD peca----------------------------------------------------------------------
 
 # Construtor
 def cria_peca(s):  # str -> peca
@@ -208,17 +242,24 @@ def peca_para_str(j):  # peca -> str
         raise ValueError('peca_para_str: argumento invalido')
 
 
-# Funcoes de alto nivel
-def peca_para_inteiro(j):  # peca -> N
+# Funcoes de alto nivel---------------------------------------------------------
+def peca_para_inteiro(peca):  # peca -> N
     """
     Converte o valor de uma peca para o valor 1, -1 ou 0 dependendo da peca
-    :param j: peca
+    :param peca: peca
     :return: inteiro com o valor de 1, -1 ou 0 dependendo do valor da peca
     """
-    return j
+    if pecas_iguais(cria_peca(' '), peca):
+        return 0
+    elif pecas_iguais(cria_peca('X'), peca):
+        return 1
+    elif pecas_iguais(cria_peca('O'), peca):
+        return -1
+    else:
+        return ValueError('peca_para_inteiro: argumento nao e uma peca')
 
 
-# TAD tabuleiro
+# TAD tabuleiro-----------------------------------------------------------------
 
 # Construtor
 def cria_tabuleiro():
@@ -270,8 +311,6 @@ def obter_vetor(tab, sel):  # tabuleiro x str -> tuplo de pecas
         sel = 2
     else:
         raise ValueError('obter_vetor: valores invalidos')
-
-
     tuplo = ()
     for linha in tab:
         tuplo = tuplo + (linha[sel],)
@@ -372,7 +411,6 @@ def tabuleiro_para_str(tab):  # tabuleiro -> str
     :param tab:
     :return:
     """
-    count = 0
     tabstr = '   a   b   c \n'
     for linha in range(3):
         tabstr += str(linha + 1)+' '
@@ -436,10 +474,11 @@ def obter_posicoes_livres(tab):
     return posicoes
 
 
-def obter_posicoes_jogador(tab, peca): # tabuleiro x peca -> tuplo de posicoes
+def obter_posicoes_jogador(tab, peca):  # tabuleiro x peca -> tuplo de posicoes
     """
 
     :param tab:
+    :param peca:
     :return:
     """
     colunas = ('a', 'b', 'c')
@@ -452,11 +491,3 @@ def obter_posicoes_jogador(tab, peca): # tabuleiro x peca -> tuplo de posicoes
     return posicoes
 
 # tabuleiro = ([0, 1, 0], [1, 0, 0], [0, 0, 1])
-t = cria_tabuleiro()
-tabuleiro_para_str(coloca_peca(t, cria_peca('X'), cria_posicao('a','1')))
-print(tabuleiro_para_str(t))
-print(tabuleiro_para_str(coloca_peca(t, cria_peca('O'), cria_posicao('b','2'))))
-print(tabuleiro_para_str(move_peca(t, cria_posicao('a','1'), cria_posicao('b','1'))))
-t = tuplo_para_tabuleiro(((0,1,-1),(-0,1,-1),(1,0,-1)))
-print(tabuleiro_para_str(t))
-print(tuple(posicao_para_str(p) for p in obter_posicoes_livres(t)))
