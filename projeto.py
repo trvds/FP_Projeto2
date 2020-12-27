@@ -1,6 +1,22 @@
 # TAD posicao-------------------------------------------------------------------
 
 # Construtores
+def obter_str_colunas():  # {} -> tuplo com strings das colunas
+    """
+
+    :return:
+    """
+    return 'a', 'b', 'c'
+
+
+def obter_str_linhas():  # {} -> tuplo com strings das colunas
+    """
+
+    :return:
+    """
+    return '1', '2', '3'
+
+
 def cria_posicao(c, ln):  # str x str -> posicao
     """
     Recebe duas cadeias de carateres correspondentes a coluna c
@@ -154,8 +170,8 @@ def obter_posicoes_adjacentes(pos):  # posicao -> tuplo de posicoes
     col = obter_pos_c(pos)
     ln = obter_pos_l(pos)
     if type(cl_adjacente(ln, lambda x: x-1)) == int:
-        posicoes += (cl_adjacente(col, lambda x: x)
-                     , cl_adjacente(ln, lambda x: x-1)),
+        posicoes += (cl_adjacente(col, lambda x: x),
+                     cl_adjacente(ln, lambda x: x-1)),
     if type(cl_adjacente(col, lambda x: x-1)) == int:
         posicoes += (cl_adjacente(col, lambda x: x-1),
                      cl_adjacente(ln, lambda x: x)),
@@ -425,15 +441,12 @@ def tabuleiro_para_str(tab):  # tabuleiro -> str
     return tabstr
 
 
-def tuplo_para_tabuleiro(tab):  # tuplo -> tabuleiro
+def tuplo_para_tabuleiro(tuplo):  # tuplo -> tabuleiro
     """
 
     :return:
     """
-    tabtuplo = ()
-    for elmts in tab:
-        tabtuplo += (tuple(elmts),)
-    return tabtuplo
+    return list(tuplo[0]), list(tuplo[1]), list(tuplo[2])
 
 
 # Funcoes de alto nivel---------------------------------------------------------
@@ -457,14 +470,14 @@ def obter_ganhador(tab):  # tabuleiro -> peca
     return livre
 
 
-def obter_posicoes_livres(tab):
+def obter_posicoes_livres(tab):  # tabuleiro -> tuplo de posicoes
     """
 
     :param tab:
     :return:
     """
-    colunas = ('a', 'b', 'c')
-    linhas = ('1', '2', '3')
+    colunas = obter_str_colunas()
+    linhas = obter_str_linhas()
     posicoes = ()
     for linha in linhas:
         for coluna in colunas:
@@ -481,13 +494,57 @@ def obter_posicoes_jogador(tab, peca):  # tabuleiro x peca -> tuplo de posicoes
     :param peca:
     :return:
     """
-    colunas = ('a', 'b', 'c')
-    linhas = ('1', '2', '3')
+    colunas = obter_str_colunas()
+    linhas = obter_str_linhas()
     posicoes = ()
     for linha in linhas:
         for coluna in colunas:
             if pecas_iguais(obter_peca(tab, cria_posicao(coluna, linha)), peca):
                 posicoes += (cria_posicao(coluna, linha),)
     return posicoes
+
+
+# Funcoes adicionais------------------------------------------------------------
+def obter_movimento_manual(tab, peca):  # tabuleiro x peca -> tuplo de posicoes
+    """
+
+    :param tab:
+    :param peca:
+    :return:
+    """
+    if peca == cria_peca('X') or peca == cria_peca('O'):
+        if conta_peca(tab, peca) < 3:
+            pos = str(input('Turno do jogador. Escolha uma posicao: '))
+            if len(pos) == 2 and type(pos) == str:
+                pos = cria_posicao(pos[0], pos[1])
+                if eh_posicao_livre(tab, pos):
+                    return pos,
+        if conta_peca(tab, peca) == 3:
+            pos = str(input('Turno do jogador. Escolha um movimento: '))
+            if len(pos) == 4 and type(pos) == str:
+                pos1 = cria_posicao(pos[0], pos[1])
+                pos2 = cria_posicao(pos[2], pos[3])
+                if obter_peca(tab,pos1) == peca and eh_posicao_livre(tab, pos2):
+                    if pos2 in obter_posicoes_adjacentes(pos1):
+                        return pos1, pos2
+    raise ValueError('obter_movimento_manual: escolha invalida')
+
+
+def conta_peca(tab, peca):  # tabuleiro x peca -> numero de pecas no tabuleiro
+    """
+
+    :param tab:
+    :param peca:
+    :return:
+    """
+    count = 0
+    colunas = obter_str_colunas()
+    linhas = obter_str_linhas()
+    for coluna in colunas:
+        for linha in linhas:
+            if peca == obter_peca(tab, cria_posicao(coluna, linha)):
+                count += 1
+    return count
+
 
 # tabuleiro = ([0, 1, 0], [1, 0, 0], [0, 0, 1])
