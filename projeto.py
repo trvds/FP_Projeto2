@@ -566,18 +566,27 @@ def minimax(tab, jog, prof, seq_mov):
     if obter_ganhador(tab) == jog or prof == 0:
         return tab, seq_mov
     else:
-
+        # melhor_res =
         for pos_jogador in obter_posicoes_jogador(tab, jog):
             for pos_adjacente in obter_posicoes_adjacentes(pos):
+
                 if eh_posicao_livre(tab, pos_adjacente):
-                    copia_tab = move_peca(cria_copia_tabuleiro(tab),
-                                          pos_jogador, pos_adjacente)
+                    mov = (pos_jogador, pos_adjacente)
+                    novo_tab = move_peca(cria_copia_tabuleiro(tab), mov[0],
+                                         mov[1])
+                    minimax = minimax(novo_tab, -jog, prof - 1, seq_mov + mov)
+                    novo_res = minimax[0]
+                    nova_seq_mov = minimax[1]
+
+                    if melhor_seq_mov == () or (novo_res > melhor_res and jog == 'X') or (novo_res < melhor_res and jog == '0'):
+                        melhor_res = novo_res
+                        melhor_seq_mov = nova_seq_mov
 
                     return minimax(copia_tab, -jog, prof-1, seq_mov + )
 
                     if melhor_sequencia == () or jog
 
-
+        return melhor_resultado, melhor_seq_mov
 
 
 
