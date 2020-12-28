@@ -582,11 +582,7 @@ def minimax(tab, jog, prof, seq_mov):
                         melhor_res = novo_res
                         melhor_seq_mov = nova_seq_mov
 
-                    return minimax(copia_tab, -jog, prof-1, seq_mov + )
-
-                    if melhor_sequencia == () or jog
-
-        return melhor_resultado, melhor_seq_mov
+        return melhor_res, melhor_seq_mov
 
 
 
