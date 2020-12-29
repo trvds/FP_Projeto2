@@ -28,6 +28,7 @@ def posicoes():  # {} -> tuplo com str de posicoes
             str_pos += (coluna + linha,)
     return str_pos
 
+
 # Construtores
 def cria_posicao(col, ln):  # str x str -> posicao
     """
@@ -181,22 +182,22 @@ def obter_posicoes_adjacentes(pos):  # posicao -> tuplo de posicoes
     :param pos: posicao
     :return: tuplo com as posicoes adjacentes
     """
-    posicoes = ()
+    posis = ()
     col = obter_pos_c(pos)
     ln = obter_pos_l(pos)
     if type(cl_adjacente(ln, lambda x: x-1)) == int:
-        posicoes += (cl_adjacente(col, lambda x: x),
-                     cl_adjacente(ln, lambda x: x-1)),
+        posis += (cl_adjacente(col, lambda x: x),
+                  cl_adjacente(ln, lambda x: x-1)),
     if type(cl_adjacente(col, lambda x: x-1)) == int:
-        posicoes += (cl_adjacente(col, lambda x: x-1),
-                     cl_adjacente(ln, lambda x: x)),
+        posis += (cl_adjacente(col, lambda x: x-1),
+                  cl_adjacente(ln, lambda x: x)),
     if type(cl_adjacente(col, lambda x: x+1)) == int:
-        posicoes += (cl_adjacente(col, lambda x: x+1),
-                     cl_adjacente(ln, lambda x: x)),
+        posis += (cl_adjacente(col, lambda x: x+1),
+                  cl_adjacente(ln, lambda x: x)),
     if type(cl_adjacente(ln, lambda x: x+1)) == int:
-        posicoes += (cl_adjacente(col, lambda x: x),
-                     cl_adjacente(ln, lambda x: x+1)),
-    return posicoes
+        posis += (cl_adjacente(col, lambda x: x),
+                  cl_adjacente(ln, lambda x: x+1)),
+    return posis
 
 
 # TAD peca----------------------------------------------------------------------
@@ -498,13 +499,13 @@ def obter_posicoes_livres(tab):  # tabuleiro -> tuplo de posicoes
     """
     colunas = obter_str_colunas()
     linhas = obter_str_linhas()
-    posicoes = ()
+    posis = ()
     for linha in linhas:
         for coluna in colunas:
             if pecas_iguais(obter_peca(tab, cria_posicao(coluna, linha)),
                             cria_peca(' ')):
-                posicoes += (cria_posicao(coluna, linha),)
-    return posicoes
+                posis += (cria_posicao(coluna, linha),)
+    return posis
 
 
 def obter_posicoes_jogador(tab, peca):  # tabuleiro x peca -> tuplo de posicoes
@@ -516,12 +517,12 @@ def obter_posicoes_jogador(tab, peca):  # tabuleiro x peca -> tuplo de posicoes
     """
     colunas = obter_str_colunas()
     linhas = obter_str_linhas()
-    posicoes = ()
+    posis = ()
     for linha in linhas:
         for coluna in colunas:
             if pecas_iguais(obter_peca(tab, cria_posicao(coluna, linha)), peca):
-                posicoes += (cria_posicao(coluna, linha),)
-    return posicoes
+                posis += (cria_posicao(coluna, linha),)
+    return posis
 
 
 # Funcoes adicionais------------------------------------------------------------
@@ -555,28 +556,25 @@ def obter_movimento_manual(tab, peca):  # tabuleiro x peca -> tuplo de posicoes
 
 def minimax(tab, jog, prof, seq_mov):
     """
-
     :param tab:
     :param jog:
     :param prof:
     :param seq_mov:
     :return:
     """
-    int_jog = peca_para_inteiro(jog)
-    if obter_ganhador(tab) == jog or prof == 0:
-        return tab, seq_mov
+    if peca_para_inteiro(obter_ganhador(tab)) == jog or prof == 0:
+        return obter_ganhador(tab), seq_mov
     else:
-        # melhor_res =
+        melhor_res = -jog
+        melhor_seq_mov = ()
         for pos_jogador in obter_posicoes_jogador(tab, jog):
-            for pos_adjacente in obter_posicoes_adjacentes(pos):
-
+            for pos_adjacente in obter_posicoes_adjacentes(pos_jogador):
                 if eh_posicao_livre(tab, pos_adjacente):
-                    mov = (pos_jogador, pos_adjacente)
-                    novo_tab = move_peca(cria_copia_tabuleiro(tab), mov[0],
-                                         mov[1])
-                    minimax = minimax(novo_tab, -jog, prof - 1, seq_mov + mov)
-                    novo_res = minimax[0]
-                    nova_seq_mov = minimax[1]
+                    novo_tab = move_peca(cria_copia_tabuleiro(tab), pos_jogador,
+                                         pos_adjacente)
+                    algoritmo = minimax(novo_tab, -jog, prof - 1, seq_mov + ((pos_jogador,) + (pos_adjacente,),))
+                    novo_res = algoritmo[0]
+                    nova_seq_mov = algoritmo[1]
 
                     if melhor_seq_mov == () or (novo_res > melhor_res and jog == 'X') or (novo_res < melhor_res and jog == '0'):
                         melhor_res = novo_res
@@ -585,5 +583,4 @@ def minimax(tab, jog, prof, seq_mov):
         return melhor_res, melhor_seq_mov
 
 
-
-# tabuleiro = ([0, 1, 0], [1, 0, 0], [0, 0, 1])
+t = ([1, 1, 0], [1, 0, -1], [0, -1, -1])
