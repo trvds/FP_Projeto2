@@ -572,15 +572,135 @@ def minimax(tab, jog, prof, seq_mov):
                 if eh_posicao_livre(tab, pos_adjacente):
                     novo_tab = move_peca(cria_copia_tabuleiro(tab), pos_jogador,
                                          pos_adjacente)
-                    algoritmo = minimax(novo_tab, -jog, prof - 1, seq_mov + ((pos_jogador,) + (pos_adjacente,),))
+                    algoritmo = minimax(novo_tab, -jog, prof - 1, seq_mov +
+                                        ((pos_jogador,) + (pos_adjacente,),))
                     novo_res = algoritmo[0]
                     nova_seq_mov = algoritmo[1]
-
-                    if melhor_seq_mov == () or (novo_res > melhor_res and jog == 'X') or (novo_res < melhor_res and jog == '0'):
+                    if melhor_seq_mov == () or \
+                            (novo_res > melhor_res and jog == 'X') or \
+                            (novo_res < melhor_res and jog == '0'):
                         melhor_res = novo_res
                         melhor_seq_mov = nova_seq_mov
-
         return melhor_res, melhor_seq_mov
 
 
-t = ([1, 1, 0], [1, 0, -1], [0, -1, -1])
+def vitoria(tab, peca):  # tab x peca -> posicao
+    """
+    Deteta uma posicao onde possa haver uma possivel vitoria, retornando essa
+    mesma posicao
+    """
+    for coluna in obter_str_colunas():
+        for linha in obter_str_linhas():
+            pos = cria_posicao(coluna, linha)
+            if eh_posicao_livre(pos):
+                coloca_peca(cria_copia_tabuleiro(tab), peca, pos)
+                if obter_ganhador(tab) != cria_peca(' '):
+                    return pos
+    return 0
+
+
+def bloqueio(tab, peca):  # tab x peca -> posicao
+    """
+
+    :param tab:
+    :param peca:
+    :return:
+    """
+    if peca_para_inteiro(peca) == 1:
+        peca_contraria = cria_peca('O')
+    elif peca_para_inteiro(peca) == -1:
+        peca_contraria = cria_peca('X')
+    else:
+        print('erro!?!?!?')
+    return vitoria(tab, peca_contraria)
+
+
+def centro(tab):  # tab -> posicao
+    """
+
+    :param tab:
+    :param peca:
+    :return:
+    """
+    if eh_posicao_livre(tab, cria_posicao('b', '2')):
+        return cria_posicao('b', '2')
+    return 0
+
+
+def canto_vazio(tab):  # tab -> posicao
+    """
+
+    :param tab:
+    :param peca:
+    :return:
+    """
+    cantos = (cria_posicao('a', '1'),
+              cria_posicao('c', '1'),
+              cria_posicao('a', '3'),
+              cria_posicao('c', '3'),)
+    for canto in cantos:
+        if eh_posicao_livre(tab, canto):
+            return canto
+    return 0
+
+
+def lateral_vazia(tab):  # tab -> posicao
+    """
+
+    :param tab:
+    :return:
+    """
+    laterais = (cria_posicao('b', '1'),
+                cria_posicao('a', '2'),
+                cria_posicao('c', '2'),
+                cria_posicao('b', '3'),)
+    for lateral in laterais:
+        if eh_posicao_livre(tab, lateral):
+            return lateral
+    return 0
+
+
+def facil(tab, peca):
+    """
+
+    :param tab:
+    :param peca:
+    :return:
+    """
+    for pos_peca in obter_posicoes_jogador(tab, peca):
+        for pos_adjacente in obter_posicoes_adjacentes(pos_peca):
+            if eh_posicao_livre(tab, pos_adjacente):
+                return pos_peca, pos_adjacente
+    return False
+
+
+def normal(tab, peca):
+    """
+
+    :param tab:
+    :param peca:
+    :return:
+    """
+    movimentos = minimax(tab, peca, 1, ())
+    return movimentos(1)
+
+
+def dificil(tab, peca):
+    """
+
+    :param tab:
+    :param peca:
+    :return:
+    """
+    movimentos = minimax(tab, peca, 1, ())
+    return movimentos(5)
+
+
+
+
+def obter_movimento_auto(tab, peca):
+
+
+t = ([1, 0, 1], [1, 0, -1], [0, -1, -1])
+
+m = minimax(t, -1, 5,())
