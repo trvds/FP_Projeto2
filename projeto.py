@@ -166,6 +166,10 @@ def cl_adjacente(cl, fn):
         cl = 1
     elif cl == 'c':
         cl = 2
+    if type(cl) == int:
+        if 0 <= fn(cl) <= 2:
+            cl = fn(cl)
+            return obter_pos_c((cl, False))
     if cl == '1':
         cl = 0
     elif cl == '2':
@@ -173,7 +177,8 @@ def cl_adjacente(cl, fn):
     elif cl == '3':
         cl = 2
     if 0 <= fn(cl) <= 2:
-        return fn(cl)
+        cl = fn(cl)
+        return obter_pos_l((False, cl))
     return False
 
 
@@ -187,18 +192,25 @@ def obter_posicoes_adjacentes(pos):  # posicao -> tuplo de posicoes
     posis = ()
     col = obter_pos_c(pos)
     ln = obter_pos_l(pos)
-    if type(cl_adjacente(ln, lambda x: x-1)) == int:
-        posis += (cl_adjacente(col, lambda x: x),
-                  cl_adjacente(ln, lambda x: x-1)),
-    if type(cl_adjacente(col, lambda x: x-1)) == int:
-        posis += (cl_adjacente(col, lambda x: x-1),
-                  cl_adjacente(ln, lambda x: x)),
-    if type(cl_adjacente(col, lambda x: x+1)) == int:
-        posis += (cl_adjacente(col, lambda x: x+1),
-                  cl_adjacente(ln, lambda x: x)),
-    if type(cl_adjacente(ln, lambda x: x+1)) == int:
-        posis += (cl_adjacente(col, lambda x: x),
-                  cl_adjacente(ln, lambda x: x+1)),
+    laterais = (cria_posicao('a', '2'), cria_posicao('b', '1'),
+                cria_posicao('b', '3'), cria_posicao('c', '2'))
+    for c in (cl_adjacente(col, lambda x: x - 1),
+              cl_adjacente(col, lambda x: x),
+              cl_adjacente(col, lambda x: x + 1)):
+        for l in (cl_adjacente(ln, lambda x: x - 1),
+                  cl_adjacente(ln, lambda x: x),
+                  cl_adjacente(ln, lambda x: x + 1)):
+            if type(c) == str and type(l) == str and not \
+                    posicoes_iguais(pos, cria_posicao(c, l)):
+                posis += (cria_posicao(c, l)),
+    if pos == laterais[0]:
+        posis = (posis[0], posis[2], posis[3])
+    if pos == laterais[1]:
+        posis = (posis[0], posis[1], posis[3])
+    if pos == laterais[2]:
+        posis = (posis[1], posis[3], posis[4])
+    if pos == laterais[3]:
+        posis = (posis[1], posis[2], posis[4])
     return posis
 
 
@@ -432,12 +444,16 @@ def eh_tabuleiro(arg):  # universal -> booleano
                 x_count += 1
             if elmt == -1:
                 o_count += 1
-
-    if x_count <= 3 and o_count <= 3:
-        if x_count == o_count - 1 or o_count == x_count - 1 or \
-                x_count == o_count:
-            return True
-    return False
+    if x_count > 3 or o_count > 3:
+        return False
+    if x_count > o_count + 1 or o_count > x_count + 1:
+        return False
+    if obter_ganhador(arg) != 0:
+        pos = obter_posicoes_jogador(arg, obter_ganhador(arg))[0]
+        remove_peca(cria_copia_tabuleiro(arg), pos)
+        if obter_ganhador(arg) != 0:
+            return False
+    return True
 
 
 def eh_posicao_livre(tab, pos):  # tabuleiro x posicao -> booleano
