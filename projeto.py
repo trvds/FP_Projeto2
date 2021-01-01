@@ -194,12 +194,12 @@ def obter_posicoes_adjacentes(pos):  # posicao -> tuplo de posicoes
     ln = obter_pos_l(pos)
     laterais = (cria_posicao('a', '2'), cria_posicao('b', '1'),
                 cria_posicao('b', '3'), cria_posicao('c', '2'))
-    for c in (cl_adjacente(col, lambda x: x - 1),
-              cl_adjacente(col, lambda x: x),
-              cl_adjacente(col, lambda x: x + 1)):
-        for l in (cl_adjacente(ln, lambda x: x - 1),
-                  cl_adjacente(ln, lambda x: x),
-                  cl_adjacente(ln, lambda x: x + 1)):
+    for l in (cl_adjacente(ln, lambda x: x - 1),
+              cl_adjacente(ln, lambda x: x),
+              cl_adjacente(ln, lambda x: x + 1)):
+        for c in (cl_adjacente(col, lambda x: x - 1),
+                  cl_adjacente(col, lambda x: x),
+                  cl_adjacente(col, lambda x: x + 1)):
             if type(c) == str and type(l) == str and not \
                     posicoes_iguais(pos, cria_posicao(c, l)):
                 posis += (cria_posicao(c, l)),
@@ -312,7 +312,6 @@ def peca_para_inteiro(peca):  # peca -> N
 
 def inteiro_para_peca(inteiro):
     """
-
     :param inteiro:
     :return:
     """
@@ -419,9 +418,10 @@ def move_peca(tab, pos1, pos2):  # tabuleiro x posicao x posicao -> tabuleiro
     :param pos2: posicao destino
     :return: tabuleiro
     """
-    peca = tab[pos1[1]][pos1[0]]
-    tab = coloca_peca(tab, peca, pos2)
-    tab = remove_peca(tab, pos1)
+    if pos1 != pos2:
+        peca = tab[pos1[1]][pos1[0]]
+        tab = coloca_peca(tab, peca, pos2)
+        tab = remove_peca(tab, pos1)
     return tab
 
 
@@ -450,9 +450,12 @@ def eh_tabuleiro(arg):  # universal -> booleano
         return False
     if obter_ganhador(arg) != 0:
         pos = obter_posicoes_jogador(arg, obter_ganhador(arg))[0]
-        remove_peca(cria_copia_tabuleiro(arg), pos)
+        peca = obter_peca(arg, pos)
+        remove_peca(arg, pos)
         if obter_ganhador(arg) != 0:
+            coloca_peca(arg, peca, pos)
             return False
+        coloca_peca(arg, peca, pos)
     return True
 
 
@@ -595,6 +598,7 @@ def obter_movimento_manual(tab, peca):  # tabuleiro x peca -> tuplo de posicoes
             if obter_peca(tab,pos1) == peca and eh_posicao_livre(tab, pos2):
                 if pos2 in obter_posicoes_adjacentes(pos1):
                     return pos1, pos2
+    return ValueError('obter_movimento_manual: escolha invalida')
 
 
 def minimax(tab, jog, prof, seq_mov):
@@ -638,7 +642,6 @@ def vitoria(tab, peca):  # tab x peca -> posicao
 
 def bloqueio(tab, peca):  # tab x peca -> posicao
     """
-
     :param tab:
     :param peca:
     :return:
@@ -650,7 +653,6 @@ def bloqueio(tab, peca):  # tab x peca -> posicao
 
 def centro(tab):  # tab -> posicao
     """
-
     :param tab:
     :return:
     """
@@ -661,7 +663,6 @@ def centro(tab):  # tab -> posicao
 
 def canto_vazio(tab):  # tab -> posicao
     """
-
     :param tab:
     :return:
     """
@@ -677,7 +678,6 @@ def canto_vazio(tab):  # tab -> posicao
 
 def lateral_vazia(tab):  # tab -> posicao
     """
-
     :param tab:
     :return:
     """
@@ -693,7 +693,6 @@ def lateral_vazia(tab):  # tab -> posicao
 
 def fase_colocacao(tab, peca):
     """
-
     :param tab:
     :param peca:
     :return:
@@ -713,7 +712,6 @@ def fase_colocacao(tab, peca):
 
 def facil(tab, peca):
     """
-
     :param tab:
     :param peca:
     :return:
@@ -727,7 +725,6 @@ def facil(tab, peca):
 
 def normal(tab, peca):
     """
-
     :param tab:
     :param peca:
     :return:
@@ -738,7 +735,6 @@ def normal(tab, peca):
 
 def dificil(tab, peca):
     """
-
     :param tab:
     :param peca:
     :return:
@@ -750,7 +746,6 @@ def dificil(tab, peca):
 
 def obter_movimento_auto(tab, peca, dif):
     """
-
     :param tab:
     :param peca:
     :param dif:
@@ -773,7 +768,6 @@ def obter_movimento_auto(tab, peca, dif):
 
 def eh_dificuldade(dificuldade):  # str -> booleano
     """
-
     :param dificuldade:
     :return:
     """
@@ -786,14 +780,12 @@ def eh_dificuldade(dificuldade):  # str -> booleano
 
 def moinho(peca_str, dificuldade):  # str x str -> str
     """
-
     :param peca_str:
     :param dificuldade:
     :return:
     """
     if not eh_dificuldade(dificuldade):
         raise ValueError('moinho: argumentos invalidos')
-
     if peca_str == peca_para_str(cria_peca('X')):
         jog = peca_para_inteiro(cria_peca('X'))
     elif peca_str == peca_para_str(cria_peca('O')):
@@ -815,7 +807,8 @@ def moinho(peca_str, dificuldade):  # str x str -> str
         else:
             move_peca(tab, mov[0], mov[1])
         print(tabuleiro_para_str(tab))
-
+        if obter_ganhador(tab):
+            break
         print('Turno do computador (' + dificuldade + '):')
         mov = obter_movimento_auto(tab, inteiro_para_peca(-jog), dificuldade)
         if len(mov) == 1:
@@ -823,4 +816,5 @@ def moinho(peca_str, dificuldade):  # str x str -> str
         else:
             move_peca(tab, mov[0], mov[1])
         print(tabuleiro_para_str(tab))
-    peca_para_str(obter_ganhador(tab))
+    return peca_para_str(obter_ganhador(tab))
+
