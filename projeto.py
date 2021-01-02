@@ -639,9 +639,10 @@ def minimax(tab, jog, prof, seq_mov):
             for pos_adjacente in obter_posicoes_adjacentes(pos_jogador):
                 if eh_posicao_livre(tab, pos_adjacente):
                     t = move_peca(cria_copia_tabuleiro(tab), pos_jogador, pos_adjacente)
-                    novo_res, nova_seq_mov = minimax(t, -jog, prof - 1, seq_mov + ((pos_jogador,) + (pos_adjacente,),))
-                    if melhor_seq_mov == () or (novo_res > melhor_res and jog == 1) or (novo_res < melhor_res and jog == -1):
-                        melhor_res, melhor_seq_mov = novo_res, nova_seq_mov
+                    if eh_tabuleiro(t):
+                        novo_res, nova_seq_mov = minimax(t, -jog, prof - 1, seq_mov + ((pos_jogador,) + (pos_adjacente,),))
+                        if melhor_seq_mov == () or (novo_res > melhor_res and jog == 1) or (novo_res < melhor_res and jog == -1):
+                            melhor_res, melhor_seq_mov = novo_res, nova_seq_mov
         return melhor_res, melhor_seq_mov
 
 
@@ -760,7 +761,6 @@ def dificil(tab, peca):
     :return:
     """
     movimentos = minimax(tab, peca_para_inteiro(peca), 5, ())
-    print(movimentos)
     return movimentos[1][0]
 
 
@@ -812,7 +812,7 @@ def moinho(peca_str, dificuldade):  # str x str -> str
         jog = peca_para_inteiro(cria_peca('O'))
     else:
         raise ValueError('moinho: argumentos invalidos')
-    print('Bem-vindo ao JOGO DO MOINHO. Nivel de dificuldade facil.')
+    print('Bem-vindo ao JOGO DO MOINHO. Nivel de dificuldade '+dificuldade+'.')
     tab = cria_tabuleiro()
     print(tabuleiro_para_str(tab))
     if jog == -1:
