@@ -343,7 +343,7 @@ def cria_copia_tabuleiro(tab):  # tabuleiro -> tabuleiro
     :return: copia do tabuleiro
     """
     if not eh_tabuleiro(tab):
-        raise ValueError()
+        raise ValueError('cria_copia_tabuleiro: tabuleiro invalido')
     copia = (tab[0].copy(), tab[1].copy(), tab[2].copy())
     return copia
 
@@ -584,21 +584,42 @@ def obter_movimento_manual(tab, peca):  # tabuleiro x peca -> tuplo de posicoes
     :param peca: peca
     :return: tuplo com posicoes
     """
+    linhas = obter_str_linhas()
+    colunas = obter_str_colunas()
     if len(obter_posicoes_jogador(tab, peca)) < 3:
         pos = str(input('Turno do jogador. Escolha uma posicao: '))
-        if len(pos) == 2 and type(pos) == str:
+        if len(pos) == 2 and pos[0] in colunas and pos[1] in linhas:
             pos = cria_posicao(pos[0], pos[1])
             if eh_posicao_livre(tab, pos):
                 return pos,
     if len(obter_posicoes_jogador(tab, peca)) == 3:
         pos = str(input('Turno do jogador. Escolha um movimento: '))
-        if len(pos) == 4 and type(pos) == str:
+        if len(pos) == 4 and pos[0] in colunas and pos[1] in linhas \
+                and pos[2] in colunas and pos[3] in linhas:
             pos1 = cria_posicao(pos[0], pos[1])
             pos2 = cria_posicao(pos[2], pos[3])
-            if obter_peca(tab,pos1) == peca and eh_posicao_livre(tab, pos2):
-                if pos2 in obter_posicoes_adjacentes(pos1):
+            if obter_peca(tab, pos1) == peca:
+                if eh_posicao_livre(tab, pos2):
+                    if pos2 in obter_posicoes_adjacentes(pos1):
+                        return pos1, pos2
+                if posicoes_iguais(pos1, pos2) and \
+                        len(obter_pos_adj_livres(tab, pos1)) == 0:
                     return pos1, pos2
-    return ValueError('obter_movimento_manual: escolha invalida')
+    raise ValueError('obter_movimento_manual: escolha invalida')
+
+
+def obter_pos_adj_livres(tab, pos):
+    """
+
+    :param tab:
+    :param pos:
+    :return:
+    """
+    posis = ()
+    for pos_adjacente in obter_posicoes_adjacentes(pos):
+        if eh_posicao_livre(tab, pos_adjacente):
+            posis += pos_adjacente,
+    return posis
 
 
 def minimax(tab, jog, prof, seq_mov):
@@ -617,10 +638,9 @@ def minimax(tab, jog, prof, seq_mov):
         for pos_jogador in obter_posicoes_jogador(tab, jog):
             for pos_adjacente in obter_posicoes_adjacentes(pos_jogador):
                 if eh_posicao_livre(tab, pos_adjacente):
-                    t = cria_copia_tabuleiro(tab)
-                    move_peca(t, pos_jogador, pos_adjacente)
+                    t = move_peca(cria_copia_tabuleiro(tab), pos_jogador, pos_adjacente)
                     novo_res, nova_seq_mov = minimax(t, -jog, prof - 1, seq_mov + ((pos_jogador,) + (pos_adjacente,),))
-                    if melhor_seq_mov == () or (novo_res > melhor_res and jog == 1) or (novo_res < melhor_res and jog == 0):
+                    if melhor_seq_mov == () or (novo_res > melhor_res and jog == 1) or (novo_res < melhor_res and jog == -1):
                         melhor_res, melhor_seq_mov = novo_res, nova_seq_mov
         return melhor_res, melhor_seq_mov
 
