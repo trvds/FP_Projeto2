@@ -651,10 +651,15 @@ def minimax(tab, jog, prof, seq_mov):
         for pos_jogador in obter_posicoes_jogador(tab, jog):
             for pos_adjacente in obter_posicoes_adjacentes(pos_jogador):
                 if eh_posicao_livre(tab, pos_adjacente):
-                    t = move_peca(cria_copia_tabuleiro(tab), pos_jogador, pos_adjacente)
+                    t = move_peca(cria_copia_tabuleiro(tab), pos_jogador,
+                                  pos_adjacente)
                     if eh_tabuleiro(t):
-                        novo_res, nova_seq_mov = minimax(t, -jog, prof - 1, seq_mov + ((pos_jogador,) + (pos_adjacente,),))
-                        if melhor_seq_mov == () or (novo_res > melhor_res and jog == 1) or (novo_res < melhor_res and jog == -1):
+                        novo_res, nova_seq_mov = \
+                            minimax(t, -jog, prof - 1, seq_mov +
+                                    ((pos_jogador,) + (pos_adjacente,),))
+                        if melhor_seq_mov == () or \
+                                (novo_res > melhor_res and jog == 1) or \
+                                (novo_res < melhor_res and jog == -1):
                             melhor_res, melhor_seq_mov = novo_res, nova_seq_mov
         return melhor_res, melhor_seq_mov
 
@@ -850,4 +855,3 @@ def moinho(peca_str, dificuldade):  # str x str -> str
             move_peca(tab, mov[0], mov[1])
         print(tabuleiro_para_str(tab))
     return peca_para_str(obter_ganhador(tab))
-
