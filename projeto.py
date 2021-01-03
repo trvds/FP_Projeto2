@@ -149,7 +149,7 @@ def posicao_para_str(pos):  # posicao -> str
     """
     return obter_pos_c(pos) + obter_pos_l(pos)
 
-    pecas
+
 # Funcoes de alto nivel---------------------------------------------------------
 def obter_posicoes_adjacentes(pos):  # posicao -> tuplo de posicoes
     """
@@ -162,24 +162,24 @@ def obter_posicoes_adjacentes(pos):  # posicao -> tuplo de posicoes
     for pos_str in posis_str:
         posis += cria_posicao(pos_str[0], pos_str[1]),
     retorno = ()
-    if pos == posis[1] or pos == posis[3] or pos == posis[4]:  # b1, a2, b2
-        retorno += posis[0],                                   # a1
-    if pos == posis[0] or pos == posis[2] or pos == posis[4]:  # a1, c1, b2
-        retorno += posis[1],                                   # b1
-    if pos == posis[1] or pos == posis[4] or pos == posis[5]:
-        retorno += posis[2],
-    if pos == posis[0] or pos == posis[4] or pos == posis[6]:
-        retorno += posis[3],
-    if pos in posis and pos != posis[4]:
-        retorno += posis[4],
-    if pos == posis[2] or pos == posis[4] or pos == posis[8]:
-        retorno += posis[5],
-    if pos == posis[3] or pos == posis[4] or pos == posis[7]:
-        retorno += posis[6],
-    if pos == posis[4] or pos == posis[6] or pos == posis[8]:
-        retorno += posis[7],
-    if pos == posis[4] or pos == posis[5] or pos == posis[7]:
-        retorno += posis[8],
+    if pos == posis[1] or pos == posis[3] or pos == posis[4]:  # pos: b1, a2, b2
+        retorno += posis[0],                                   # adjacente: a1
+    if pos == posis[0] or pos == posis[2] or pos == posis[4]:  # pos: a1, c1, b2
+        retorno += posis[1],                                   # adjacente: b1
+    if pos == posis[1] or pos == posis[4] or pos == posis[5]:  # pos:
+        retorno += posis[2],                                   # adjacente: c1
+    if pos == posis[0] or pos == posis[4] or pos == posis[6]:  # pos: a1, c1, b2
+        retorno += posis[3],                                   # adjacente: a2
+    if pos in posis and pos != posis[4]:                       # pos: todas
+        retorno += posis[4],                                   # adjacente: b2
+    if pos == posis[2] or pos == posis[4] or pos == posis[8]:  # pos: c1, b2, c3
+        retorno += posis[5],                                   # adjacente: c2
+    if pos == posis[3] or pos == posis[4] or pos == posis[7]:  # pos: a2, b2, b3
+        retorno += posis[6],                                   # adjacente: a3
+    if pos == posis[4] or pos == posis[6] or pos == posis[8]:  # pos: b2, a3, c3
+        retorno += posis[7],                                   # adjacente: b3
+    if pos == posis[4] or pos == posis[5] or pos == posis[7]:  # pos: b2, c2, b3
+        retorno += posis[8],                                   # adjacente: c3
     return retorno
 
 
@@ -196,11 +196,11 @@ def cria_peca(s):  # str -> peca
     if s != 'X' and s != 'O' and s != ' ':
         raise ValueError('cria_peca: argumento invalido')
     if s == 'X':
-        return 1
+        return {1}
     elif s == 'O':
-        return -1
+        return {-1}
     elif s == ' ':
-        return 0
+        return {0}
 
 
 def cria_copia_peca(peca):  # peca -> peca
@@ -226,10 +226,8 @@ def eh_peca(arg):  # universal -> booleano
     :param arg: valor da peca
     :return: True se o argumento for uma peca, False caso contrario
     """
-    if type(arg) == int:
-        if arg == cria_peca('X') or arg == cria_peca('O') \
-                or arg == cria_peca(' '):
-            return True
+    if arg == cria_peca('X') or arg == cria_peca('O') or arg == cria_peca(' '):
+        return True
     return False
 
 
@@ -420,11 +418,11 @@ def eh_tabuleiro(arg):  # universal -> booleano
         return False
     if x_count > o_count + 1 or o_count > x_count + 1:
         return False
-    if obter_ganhador(arg) != 0:
+    if obter_ganhador(arg) != cria_peca(' '):
         pos = obter_posicoes_jogador(arg, obter_ganhador(arg))[0]
         peca = obter_peca(arg, pos)
         remove_peca(arg, pos)
-        if obter_ganhador(arg) != 0:
+        if obter_ganhador(arg) != cria_peca(' '):
             coloca_peca(arg, peca, pos)
             return False
         coloca_peca(arg, peca, pos)
@@ -489,16 +487,16 @@ def tuplo_para_tabuleiro(tuplo):  # tuplo -> tabuleiro
     """
     tab = ()
     for elemts in tuplo:
-        linha = ()
+        linha = []
         for elemt in elemts:
-            if elemt == cria_peca(' '):
+            if elemt == 0:
                 linha += cria_peca(' '),
-            if elemt == cria_peca('X'):
+            if elemt == 1:
                 linha += cria_peca('X'),
-            if elemt == cria_peca('O'):
+            if elemt == -1:
                 linha += cria_peca('O'),
-        tab += linha
-    return list(tuplo[0]), list(tuplo[1]), list(tuplo[2])
+        tab += linha.copy(),
+    return tab
 
 
 # Funcoes de alto nivel---------------------------------------------------------
@@ -617,7 +615,7 @@ def minimax(tab, jog, prof, seq_mov):
     else:
         melhor_res = -jog
         melhor_seq_mov = ()
-        for pos_jogador in obter_posicoes_jogador(tab, jog):
+        for pos_jogador in obter_posicoes_jogador(tab, inteiro_para_peca(jog)):
             for pos_adjacente in obter_posicoes_adjacentes(pos_jogador):
                 if eh_posicao_livre(tab, pos_adjacente):
                     t = move_peca(cria_copia_tabuleiro(tab), pos_jogador,
@@ -814,7 +812,7 @@ def moinho(peca_str, dificuldade):  # str x str -> str
         else:
             move_peca(tab, mov[0], mov[1])
         print(tabuleiro_para_str(tab))
-        if obter_ganhador(tab):
+        if obter_ganhador(tab) != cria_peca(' '):
             break
         print('Turno do computador (' + dificuldade + '):')
         mov = obter_movimento_auto(tab, inteiro_para_peca(-jog), dificuldade)
