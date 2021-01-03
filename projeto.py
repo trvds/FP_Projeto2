@@ -242,11 +242,11 @@ def cria_copia_peca(peca):  # peca -> peca
     """
     if not eh_peca(peca):
         return ValueError('cria_copia_peca: argumento invalido')
-    if peca == 0:
+    if peca == cria_peca(' '):
         return cria_peca(' ')
-    if peca == 1:
+    if peca == cria_peca('X'):
         return cria_peca('X')
-    if peca == -1:
+    if peca == cria_peca('O'):
         return cria_peca('O')
 
 
@@ -258,7 +258,8 @@ def eh_peca(arg):  # universal -> booleano
     :return: True se o argumento for uma peca, False caso contrario
     """
     if type(arg) == int:
-        if arg == 1 or arg == -1 or arg == 0:
+        if arg == cria_peca('X') or arg == cria_peca('O') \
+                or arg == cria_peca(' '):
             return True
     return False
 
@@ -285,11 +286,11 @@ def peca_para_str(peca):  # peca -> str
     :param peca: peca
     :return:
     """
-    if peca == 1:
+    if peca == cria_peca('X'):
         return '[X]'
-    if peca == -1:
+    if peca == cria_peca('O'):
         return '[O]'
-    if peca == 0:
+    if peca == cria_peca(' '):
         return '[ ]'
 
 
@@ -333,7 +334,9 @@ def cria_tabuleiro():  # {} -> tabuleiro
     Cria um tabuleiro vazio.
     :return: tabuleiro 3x3 vazio
     """
-    return [0, 0, 0], [0, 0, 0], [0, 0, 0]
+    return [cria_peca(' '), cria_peca(' '), cria_peca(' ')], \
+           [cria_peca(' '), cria_peca(' '), cria_peca(' ')], \
+           [cria_peca(' '), cria_peca(' '), cria_peca(' ')],
 
 
 def cria_copia_tabuleiro(tab):  # tabuleiro -> tabuleiro
@@ -405,7 +408,7 @@ def remove_peca(tab, pos):  # tabuleiro x posicao -> tabuleiro
     :param pos: posicao
     :return: tabuleiro
     """
-    tab[pos[1]][pos[0]] = 0
+    tab[pos[1]][pos[0]] = cria_peca(' ')
     return tab
 
 
@@ -440,9 +443,9 @@ def eh_tabuleiro(arg):  # universal -> booleano
         if type(elmts) != list or len(elmts) != 3:
             return False
         for elmt in elmts:
-            if elmt == 1:
+            if elmt == cria_peca('X'):
                 x_count += 1
-            if elmt == -1:
+            if elmt == cria_peca('O'):
                 o_count += 1
     if x_count > 3 or o_count > 3:
         return False
@@ -466,7 +469,7 @@ def eh_posicao_livre(tab, pos):  # tabuleiro x posicao -> booleano
     :param pos: posicao
     :return: True se a posicao estiver livre, False caso contrario
     """
-    if tab[pos[1]][pos[0]] == 0:
+    if tab[pos[1]][pos[0]] == cria_peca(' '):
         return True
     return False
 
@@ -515,6 +518,17 @@ def tuplo_para_tabuleiro(tuplo):  # tuplo -> tabuleiro
     :param tuplo: tuplo
     :return: tabuleiro
     """
+    tab = ()
+    for elemts in tuplo:
+        linha = ()
+        for elemt in elemts:
+            if elemt == cria_peca(' '):
+                linha += cria_peca(' '),
+            if elemt == cria_peca('X'):
+                linha += cria_peca('X'),
+            if elemt == cria_peca('O'):
+                linha += cria_peca('O'),
+        tab += linha
     return list(tuplo[0]), list(tuplo[1]), list(tuplo[2])
 
 
@@ -529,7 +543,6 @@ def obter_ganhador(tab):  # tabuleiro -> peca
     o = cria_peca('O')
     livre = cria_peca(' ')
     indices = obter_str_linhas() + obter_str_colunas()
-
     for indice in indices:
         vetor = obter_vetor(tab, indice)
         if vetor == (x, x, x):
@@ -815,7 +828,7 @@ def moinho(peca_str, dificuldade):  # str x str -> str
     print('Bem-vindo ao JOGO DO MOINHO. Nivel de dificuldade '+dificuldade+'.')
     tab = cria_tabuleiro()
     print(tabuleiro_para_str(tab))
-    if jog == -1:
+    if jog == peca_para_inteiro(cria_peca('O')):
         print('Turno do computador ('+dificuldade+'):')
         mov = obter_movimento_auto(tab, inteiro_para_peca(-jog), dificuldade)
         coloca_peca(tab, inteiro_para_peca(-jog), mov[0])
