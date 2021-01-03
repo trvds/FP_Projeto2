@@ -23,9 +23,9 @@ def posicoes():  # {} -> tuplo com str de posicoes
     :return: tuplo com posicoes
     """
     str_pos = ()
-    for coluna in obter_str_colunas():
-        for linha in obter_str_linhas():
-            str_pos += (coluna + linha,)
+    for linha in obter_str_linhas():
+        for coluna in obter_str_colunas():
+            str_pos += (coluna, linha),
     return str_pos
 
 
@@ -149,39 +149,7 @@ def posicao_para_str(pos):  # posicao -> str
     """
     return obter_pos_c(pos) + obter_pos_l(pos)
 
-
-# Funcoes Auxiliares
-def cl_adjacente(cl, fn):
-    """
-    Funcao auxiliar que fornece uma coluna ou linha adjacente, dependendo do
-    funcional utilizado.
-    :param cl: str (coluna ou linha)
-    :param fn: funcional (pode ser x-1 ou x+1)
-    :return: indice da coluna/linha modificado, dependendo do funcional, False
-    se o indice nao pertence a tabela
-    """
-    if cl == 'a':
-        cl = 0
-    elif cl == 'b':
-        cl = 1
-    elif cl == 'c':
-        cl = 2
-    if type(cl) == int:
-        if 0 <= fn(cl) <= 2:
-            cl = fn(cl)
-            return obter_pos_c((cl, False))
-    if cl == '1':
-        cl = 0
-    elif cl == '2':
-        cl = 1
-    elif cl == '3':
-        cl = 2
-    if 0 <= fn(cl) <= 2:
-        cl = fn(cl)
-        return obter_pos_l((False, cl))
-    return False
-
-
+    pecas
 # Funcoes de alto nivel---------------------------------------------------------
 def obter_posicoes_adjacentes(pos):  # posicao -> tuplo de posicoes
     """
@@ -189,29 +157,30 @@ def obter_posicoes_adjacentes(pos):  # posicao -> tuplo de posicoes
     :param pos: posicao
     :return: tuplo com as posicoes adjacentes
     """
+    posis_str = posicoes()  # (a1, b1, c1, a2, b2, c2, a3, b3, c3)
     posis = ()
-    col = obter_pos_c(pos)
-    ln = obter_pos_l(pos)
-    laterais = (cria_posicao('a', '2'), cria_posicao('b', '1'),
-                cria_posicao('b', '3'), cria_posicao('c', '2'))
-    for l in (cl_adjacente(ln, lambda x: x - 1),
-              cl_adjacente(ln, lambda x: x),
-              cl_adjacente(ln, lambda x: x + 1)):
-        for c in (cl_adjacente(col, lambda x: x - 1),
-                  cl_adjacente(col, lambda x: x),
-                  cl_adjacente(col, lambda x: x + 1)):
-            if type(c) == str and type(l) == str and not \
-                    posicoes_iguais(pos, cria_posicao(c, l)):
-                posis += (cria_posicao(c, l)),
-    if pos == laterais[0]:
-        posis = (posis[0], posis[2], posis[3])
-    if pos == laterais[1]:
-        posis = (posis[0], posis[1], posis[3])
-    if pos == laterais[2]:
-        posis = (posis[1], posis[3], posis[4])
-    if pos == laterais[3]:
-        posis = (posis[1], posis[2], posis[4])
-    return posis
+    for pos_str in posis_str:
+        posis += cria_posicao(pos_str[0], pos_str[1]),
+    retorno = ()
+    if pos == posis[1] or pos == posis[3] or pos == posis[4]:  # b1, a2, b2
+        retorno += posis[0],                                   # a1
+    if pos == posis[0] or pos == posis[2] or pos == posis[4]:  # a1, c1, b2
+        retorno += posis[1],                                   # b1
+    if pos == posis[1] or pos == posis[4] or pos == posis[5]:
+        retorno += posis[2],
+    if pos == posis[0] or pos == posis[4] or pos == posis[6]:
+        retorno += posis[3],
+    if pos in posis and pos != posis[4]:
+        retorno += posis[4],
+    if pos == posis[2] or pos == posis[4] or pos == posis[8]:
+        retorno += posis[5],
+    if pos == posis[3] or pos == posis[4] or pos == posis[7]:
+        retorno += posis[6],
+    if pos == posis[4] or pos == posis[6] or pos == posis[8]:
+        retorno += posis[7],
+    if pos == posis[4] or pos == posis[5] or pos == posis[7]:
+        retorno += posis[8],
+    return retorno
 
 
 # TAD peca----------------------------------------------------------------------
