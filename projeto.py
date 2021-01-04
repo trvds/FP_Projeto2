@@ -86,7 +86,7 @@ def eh_posicao(pos):  # universal -> booleano
     :return: True se o argumento for uma posicao, False caso contrario
     """
     # uma posicao e um tuplo com dois elementos em que ambos variam de 0 a 2
-    if type(pos) != tuple:
+    if type(pos) != tuple or len(pos) != 2:
         return False
     col = pos[0]
     ln = pos[1]
@@ -305,7 +305,8 @@ def inteiro_para_peca(inteiro):  # N -> peca
 def cria_tabuleiro():  # {} -> tabuleiro
     """
     Cria um tabuleiro vazio.
-    :return: tabuleiro 3x3 vazio
+    :return: tabuleiro 3x3 vazio, sendo representado por um tuplo com 3 listas,
+    cada uma com 3 pecas. Uma lista representa uma linha.
     """
     return [cria_peca(' '), cria_peca(' '), cria_peca(' ')], \
            [cria_peca(' '), cria_peca(' '), cria_peca(' ')], \
@@ -346,7 +347,7 @@ def obter_vetor(tab, sel):  # tabuleiro x str -> tuplo de pecas
     """
     if sel == '1' or sel == '2' or sel == '3':
         sel = int(sel) - 1  #
-        return tuple(tab[sel])
+        return tuple(tab[sel])  #
     elif sel == 'a':
         sel = 0
     elif sel == 'b':
@@ -410,9 +411,9 @@ def eh_tabuleiro(arg):  # universal -> booleano
     """
     x_count = 0
     o_count = 0
-    if type(arg) != tuple or len(arg) != 3:
+    if type(arg) != tuple or len(arg) != 3:  # tem que ser tuplo e lenght = 3
         return False
-    for elmts in arg:
+    for elmts in arg:                     # elementos do tuplo tem que ser lista
         if type(elmts) != list or len(elmts) != 3:
             return False
         for elmt in elmts:
@@ -420,11 +421,11 @@ def eh_tabuleiro(arg):  # universal -> booleano
                 x_count += 1
             if elmt == cria_peca('O'):
                 o_count += 1
-    if x_count > 3 or o_count > 3:
-        return False
+    if x_count > 3 or o_count > 3:      # so pode ter no maximo 3 pecas no tab
+        return False  # e nao ter mais uma peca que outra
     if x_count > o_count + 1 or o_count > x_count + 1:
         return False
-    if obter_ganhador(arg) != cria_peca(' '):
+    if obter_ganhador(arg) != cria_peca(' '):     # verificar se ha 2 ganhadores
         pos = obter_posicoes_jogador(arg, obter_ganhador(arg))[0]
         peca = obter_peca(arg, pos)
         remove_peca(arg, pos)
@@ -467,13 +468,13 @@ def tabuleiro_para_str(tab):  # tabuleiro -> str
     :param tab: tabuleiro
     :return: string (representacao do tabuleiro)
     """
-    tabstr = '   a   b   c\n'
+    tabstr = '   a   b   c\n'  # indice colunas
     for linha in range(3):
-        tabstr += str(linha + 1)+' '
+        tabstr += str(linha + 1)+' '  # indice linhas
         for coluna in range(3):
-            tabstr += peca_para_str(tab[linha][coluna])
+            tabstr += peca_para_str(tab[linha][coluna])  # elementos
             if coluna < 2:
-                tabstr += '-'
+                tabstr += '-'  # separadores
             else:
                 if linha < 2:
                     tabstr += '\n'
@@ -572,13 +573,13 @@ def obter_movimento_manual(tab, peca):  # tabuleiro x peca -> tuplo de posicoes
     """
     linhas = obter_str_linhas()
     colunas = obter_str_colunas()
-    if len(obter_posicoes_jogador(tab, peca)) < 3:
+    if len(obter_posicoes_jogador(tab, peca)) < 3:  # fase de colocacao
         pos = str(input('Turno do jogador. Escolha uma posicao: '))
         if len(pos) == 2 and pos[0] in colunas and pos[1] in linhas:
             pos = cria_posicao(pos[0], pos[1])
             if eh_posicao_livre(tab, pos):
                 return pos,
-    if len(obter_posicoes_jogador(tab, peca)) == 3:
+    if len(obter_posicoes_jogador(tab, peca)) == 3:  # fase de movimentacao
         pos = str(input('Turno do jogador. Escolha um movimento: '))
         if len(pos) == 4 and pos[0] in colunas and pos[1] in linhas \
                 and pos[2] in colunas and pos[3] in linhas:
@@ -594,12 +595,13 @@ def obter_movimento_manual(tab, peca):  # tabuleiro x peca -> tuplo de posicoes
     raise ValueError('obter_movimento_manual: escolha invalida')
 
 
-def obter_pos_adj_livres(tab, pos):
+def obter_pos_adj_livres(tab, pos):  # tabuleiro x posicao -> tuplo com posicoes
     """
-
-    :param tab:
-    :param pos:
-    :return:
+    Recebe uma posicao e um tabuleiro e indica quais sao as posicoes adjacentes
+    a essa posicao que estao livres
+    :param tab: tabuleiro
+    :param pos: posicao
+    :return: tuplo com posicoes adjacentes livres
     """
     posis = ()
     for pos_adjacente in obter_posicoes_adjacentes(pos):
@@ -609,12 +611,16 @@ def obter_pos_adj_livres(tab, pos):
 
 
 def minimax(tab, jog, prof, seq_mov):
+    # tabuleiro x inteiro x inteiro x tuplo -> tuplo
     """
-    :param tab:
-    :param jog:
-    :param prof:
-    :param seq_mov:
-    :return:
+    Funcao que implementa o algoritmo minimax fornecido no enunciado do projeto.
+    :param tab: tabuleiro
+    :param jog: valor do jogador (1 para X, -1 para O)
+    :param prof: profundidade da recursao desejada
+    :param seq_mov: sequencia de movimentos, inicializa-se com um tuplo vazio
+    :return: tuplo contendo no primeiro elemento o valor do jogador e no
+    segundo um tuplo contendo movimentos (tuplo com a posicao de origem e de
+    destino)
     """
     if peca_para_inteiro(obter_ganhador(tab)) == jog or prof == 0:
         return peca_para_inteiro(obter_ganhador(tab)), seq_mov
@@ -640,7 +646,10 @@ def minimax(tab, jog, prof, seq_mov):
 def vitoria(tab, peca):  # tab x peca -> posicao
     """
     Deteta uma posicao onde possa haver uma possivel vitoria, retornando essa
-    mesma posicao
+    mesma posicao. Caso contrario devolve 0
+    :param tab: tabuleiro
+    :param peca: peca
+    :return: posicao ou 0
     """
     for coluna in obter_str_colunas():
         for linha in obter_str_linhas():
@@ -654,9 +663,11 @@ def vitoria(tab, peca):  # tab x peca -> posicao
 
 def bloqueio(tab, peca):  # tab x peca -> posicao
     """
-    :param tab:
-    :param peca:
-    :return:
+    Deteta uma posicao onde possa haver uma possivel vitoria adversaria,
+    retornando essa mesma posicao. Devolve 0 caso contrario.
+    :param tab: tabuleiro
+    :param peca: peca
+    :return: posicao ou 0
     """
     jog = peca_para_inteiro(peca)
     peca_contraria = inteiro_para_peca(-jog)
@@ -665,8 +676,9 @@ def bloqueio(tab, peca):  # tab x peca -> posicao
 
 def centro(tab):  # tab -> posicao
     """
-    :param tab:
-    :return:
+    Devolve a posicao do centro se estiver livre, 0 caso contrario
+    :param tab: tabuleiro
+    :return: posicao ou 0
     """
     if eh_posicao_livre(tab, cria_posicao('b', '2')):
         return cria_posicao('b', '2'),
@@ -675,8 +687,10 @@ def centro(tab):  # tab -> posicao
 
 def canto_vazio(tab):  # tab -> posicao
     """
-    :param tab:
-    :return:
+    Devolve a posicao do primeiro canto que estiver livre. Se nao estiver livre
+    nenhum canto devolve o inteiro 0
+    :param tab: tabuleiro
+    :return: posicao ou 0
     """
     cantos = (cria_posicao('a', '1'),
               cria_posicao('c', '1'),
@@ -690,8 +704,10 @@ def canto_vazio(tab):  # tab -> posicao
 
 def lateral_vazia(tab):  # tab -> posicao
     """
-    :param tab:
-    :return:
+    Devolve a posicao da primeira lateral que estiver livre. Se nao estiver
+    livre nenhuma lateral devolve o inteiro 0.
+    :param tab: tabuleiro
+    :return: posicao ou 0
     """
     laterais = (cria_posicao('b', '1'),
                 cria_posicao('a', '2'),
@@ -703,11 +719,12 @@ def lateral_vazia(tab):  # tab -> posicao
     return 0
 
 
-def fase_colocacao(tab, peca):
+def fase_colocacao(tab, peca):  # tabuleiro x peca -> posicao
     """
-    :param tab:
-    :param peca:
-    :return:
+    Funcao auxiliar da "obter_movimento_auto" para a fase de colocacao.
+    :param tab: tabuleiro
+    :param peca: peca
+    :return: posicao
     """
     if vitoria(tab, peca) != 0:
         return vitoria(tab, peca)
@@ -722,11 +739,13 @@ def fase_colocacao(tab, peca):
     return 0
 
 
-def facil(tab, peca):
+def facil(tab, peca):  # tab x peca -> tuplo com posicoes
     """
-    :param tab:
-    :param peca:
-    :return:
+    Permite obter o movimento no tabuleiro de acordo com a dificuldade desejada
+    (facil)
+    :param tab: tabuleiro
+    :param peca: peca
+    :return: tuplo com posicoes
     """
     for pos_peca in obter_posicoes_jogador(tab, peca):
         for pos_adjacente in obter_posicoes_adjacentes(pos_peca):
@@ -734,32 +753,39 @@ def facil(tab, peca):
                 return pos_peca, pos_adjacente
 
 
-def normal(tab, peca):
+def normal(tab, peca):  # tab x peca -> tuplo com posicoes
     """
-    :param tab:
-    :param peca:
-    :return:
+    Permite obter o movimento no tabuleiro de acordo com a dificuldade desejada
+    (normal)
+    :param tab: tabuleiro
+    :param peca: peca
+    :return: tuplo com posicoes
     """
     movimentos = minimax(tab, peca_para_inteiro(peca), 1, ())
     return movimentos[1][0]
 
 
-def dificil(tab, peca):
+def dificil(tab, peca):  # tab x peca -> tuplo com posicoes
     """
-    :param tab:
-    :param peca:
-    :return:
+    Permite obter o movimento no tabuleiro de acordo com a dificuldade desejada
+    (dificil)
+    :param tab: tabuleiro
+    :param peca: peca
+    :return: tuplo com posicoes
     """
     movimentos = minimax(tab, peca_para_inteiro(peca), 5, ())
     return movimentos[1][0]
 
 
 def obter_movimento_auto(tab, peca, dif):
+    # tab x peca x str -> tuplo com posicoes
     """
-    :param tab:
-    :param peca:
-    :param dif:
-    :return:
+    Funcao que fornece automaticamente um movimento de acordo com a dificuldade
+    desejada.
+    :param tab: tabuleiro
+    :param peca: peca
+    :param dif: string ( 'facil', 'normal' ou 'dificil')
+    :return: tuplo com posicoes
     """
     if len(obter_posicoes_jogador(tab, peca)) < 3:
         return fase_colocacao(tab, peca)
@@ -778,8 +804,9 @@ def obter_movimento_auto(tab, peca, dif):
 
 def eh_dificuldade(dificuldade):  # str -> booleano
     """
-    :param dificuldade:
-    :return:
+    Funcao que verifica se o argumento introduzido e uma dificuldade valida
+    :param dificuldade: "facil", "normal", "dificil"
+    :return: True ou False
     """
     if dificuldade == 'facil' or \
        dificuldade == 'normal' or \
@@ -790,9 +817,10 @@ def eh_dificuldade(dificuldade):  # str -> booleano
 
 def moinho(peca_str, dificuldade):  # str x str -> str
     """
-    :param peca_str:
-    :param dificuldade:
-    :return:
+    :param peca_str: string que representa uma peca ("[X]" ou "[O]")
+    :param dificuldade: string que representa uma dificuldade ("facil", "normal"
+    ou "dificil")
+    :return: string que representa a peca do vencedor ("[X]" ou "[O]")
     """
     if not eh_dificuldade(dificuldade):
         raise ValueError('moinho: argumentos invalidos')
@@ -810,6 +838,17 @@ def moinho(peca_str, dificuldade):  # str x str -> str
         mov = obter_movimento_auto(tab, inteiro_para_peca(-jog), dificuldade)
         coloca_peca(tab, inteiro_para_peca(-jog), mov[0])
         print(tabuleiro_para_str(tab))
+    return auxiliar_moinho(tab, jog, dificuldade)
+
+
+def auxiliar_moinho(tab, jog, dificuldade):
+    """
+    Funcao auxiliar da funcao "moinho".
+    :param tab: tabuleiro
+    :param jog: representacao inteira de uma peca (-1 ou 1)
+    :param dificuldade: str da dificuldade
+    :return: str da peca do vencedor
+    """
     while obter_ganhador(tab) == cria_peca(' '):
         mov = obter_movimento_manual(tab, inteiro_para_peca(jog))
         if len(mov) == 1:
