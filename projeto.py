@@ -1,33 +1,6 @@
+# Tiago Rodrigues Vieira da Silva - no. 99335
+
 # TAD posicao-------------------------------------------------------------------
-
-# Auxiliares
-def obter_str_colunas():  # {} -> tuplo com strings das colunas
-    """
-    Fornece um tuplo com as strings dos indices das colunas.
-    :return: ('a', 'b', 'c')
-    """
-    return 'a', 'b', 'c'
-
-
-def obter_str_linhas():  # {} -> tuplo com strings das colunas
-    """
-    Fornece um tuplo com as strings dos indices das linhas.
-    :return: ('1', '2', '3')
-    """
-    return '1', '2', '3'
-
-
-def posicoes():  # {} -> tuplo com str de posicoes
-    """
-    Devolve todas as posicoes de um tabuleiro
-    :return: tuplo com posicoes
-    """
-    str_pos = ()
-    for linha in obter_str_linhas():
-        for coluna in obter_str_colunas():
-            str_pos += (coluna, linha),
-    return str_pos
-
 
 # Construtores
 def cria_posicao(col, ln):  # str x str -> posicao
@@ -37,7 +10,9 @@ def cria_posicao(col, ln):  # str x str -> posicao
     argumentos forem validos.
     :param col: Coluna, pode ser 'a', 'b' ou 'c'
     :param ln: Linha, pode ser '1', '2' ou '3'
-    :return: Posicao do tabuleiro.
+    :return: Posicao do tabuleiro, representada por um tuplo com dois elementos,
+    o primeiro sendo a coluna e o segundo a linha, que sao ambos inteiros de 0 a
+    2, dependendo da posicao que se quer representar.
     """
     if col == 'a':
         col = 0
@@ -47,7 +22,6 @@ def cria_posicao(col, ln):  # str x str -> posicao
         col = 2
     else:
         raise ValueError('cria_posicao: argumentos invalidos')
-
     if ln == '1':
         ln = 0
     elif ln == '2':
@@ -56,7 +30,6 @@ def cria_posicao(col, ln):  # str x str -> posicao
         ln = 2
     else:
         raise ValueError('cria_posicao: argumentos invalidos')
-
     return col, ln
 
 
@@ -112,6 +85,7 @@ def eh_posicao(pos):  # universal -> booleano
     :param pos: posicao
     :return: True se o argumento for uma posicao, False caso contrario
     """
+    # uma posicao e um tuplo com dois elementos em que ambos variam de 0 a 2
     if type(pos) != tuple:
         return False
     col = pos[0]
@@ -150,6 +124,35 @@ def posicao_para_str(pos):  # posicao -> str
     return obter_pos_c(pos) + obter_pos_l(pos)
 
 
+# Auxiliares (tem a ver com a representacao externa da posicao)
+def obter_str_colunas():  # {} -> tuplo com strings das colunas
+    """
+    Fornece um tuplo com as strings dos indices das colunas.
+    :return: ('a', 'b', 'c')
+    """
+    return 'a', 'b', 'c'
+
+
+def obter_str_linhas():  # {} -> tuplo com strings das colunas
+    """
+    Fornece um tuplo com as strings dos indices das linhas.
+    :return: ('1', '2', '3')
+    """
+    return '1', '2', '3'
+
+
+def posicoes():  # {} -> tuplo com str de posicoes
+    """
+    Devolve todas as posicoes de um tabuleiro
+    :return: tuplo com posicoes
+    """
+    str_pos = ()
+    for linha in obter_str_linhas():
+        for coluna in obter_str_colunas():
+            str_pos += (coluna, linha),
+    return str_pos
+
+
 # Funcoes de alto nivel---------------------------------------------------------
 def obter_posicoes_adjacentes(pos):  # posicao -> tuplo de posicoes
     """
@@ -157,8 +160,8 @@ def obter_posicoes_adjacentes(pos):  # posicao -> tuplo de posicoes
     :param pos: posicao
     :return: tuplo com as posicoes adjacentes
     """
-    posis_str = posicoes()  # (a1, b1, c1, a2, b2, c2, a3, b3, c3)
-    posis = ()
+    posis_str = posicoes()  # tuplo com as posicoes em string
+    posis = () # tuplo com as posicoes(ordem:a1, b1, c1, a2, b2, c2, a3, b3, c3)
     for pos_str in posis_str:
         posis += cria_posicao(pos_str[0], pos_str[1]),
     retorno = ()
@@ -190,8 +193,10 @@ def cria_peca(s):  # str -> peca
     """
     Recebe uma cadeia de carateres correspondentea uma peca e devolve a peca
     correspondente se o argumento for valido.
-    :param s: String da peca (pode ser 'X', 'O' ou ' ')
-    :return: peca
+    :param s: string da peca (pode ser 'X', 'O' ou ' ')
+    :return: peca, que e representada internamente como o set de um elemento,
+    que contem um inteiro -1, 0 ou 1 dependendo se a peca e 'O', ' ' ou 'X'
+    respetivamente
     """
     if s != 'X' and s != 'O' and s != ' ':
         raise ValueError('cria_peca: argumento invalido')
@@ -251,7 +256,7 @@ def peca_para_str(peca):  # peca -> str
     """
     Apresenta a str relativa a peca introduzida.
     :param peca: peca
-    :return:
+    :return: string com a representacao da peca
     """
     if peca == cria_peca('X'):
         return '[X]'
@@ -278,10 +283,11 @@ def peca_para_inteiro(peca):  # peca -> N
         return ValueError('peca_para_inteiro: argumento nao e uma peca')
 
 
-def inteiro_para_peca(inteiro):
+def inteiro_para_peca(inteiro):  # N -> peca
     """
-    :param inteiro:
-    :return:
+    Converte um inteiro 1, -1 ou 0 para a peca correspondente
+    :param inteiro: inteiro com o valor de 1, -1 ou 0
+    :return: peca
     """
     if inteiro == 1:
         return cria_peca('X')
@@ -324,7 +330,7 @@ def obter_peca(tab, pos):  # tabuleiro x posicao -> peca
     Permite obter uma peca de uma posicao de um tabuleiro.
     :param tab: tabuleiro
     :param pos: posicao
-    :return:
+    :return: peca
     """
     peca = tab[pos[1]][pos[0]]
     return peca
@@ -339,7 +345,7 @@ def obter_vetor(tab, sel):  # tabuleiro x str -> tuplo de pecas
     escolhida
     """
     if sel == '1' or sel == '2' or sel == '3':
-        sel = int(sel) - 1
+        sel = int(sel) - 1  #
         return tuple(tab[sel])
     elif sel == 'a':
         sel = 0
@@ -726,7 +732,6 @@ def facil(tab, peca):
         for pos_adjacente in obter_posicoes_adjacentes(pos_peca):
             if eh_posicao_livre(tab, pos_adjacente):
                 return pos_peca, pos_adjacente
-    return False
 
 
 def normal(tab, peca):
