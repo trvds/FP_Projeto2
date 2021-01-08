@@ -817,6 +817,7 @@ def eh_dificuldade(dificuldade):  # str -> booleano
 
 def moinho(peca_str, dificuldade):  # str x str -> str
     """
+    Implementa o jogo do moinho.
     :param peca_str: string que representa uma peca ("[X]" ou "[O]")
     :param dificuldade: string que representa uma dificuldade ("facil", "normal"
     ou "dificil")
@@ -842,6 +843,7 @@ def moinho(peca_str, dificuldade):  # str x str -> str
 
 
 def auxiliar_moinho(tab, jog, dificuldade):
+    # tabuleiro x int x str -> str
     """
     Funcao auxiliar da funcao "moinho".
     :param tab: tabuleiro
