@@ -1,4 +1,4 @@
-# FP_Projeto2
+# mill-game
 
 :portugal: - Segundo projeto de Fundamentos da Programação, 2020/21: Jogo do Moinho.
 
